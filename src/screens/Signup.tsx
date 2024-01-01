@@ -18,7 +18,7 @@ type SignupScreenProps = NativeStackScreenProps<AuthStackParamList, 'Signup'>
 
 
 
-export const Signup = ({navigation}: SignupScreenProps) => {
+const Signup = ({navigation}: SignupScreenProps) => {
   const {appwrite, setIsLoggedIn} = useContext(AppwriteContext)
 
   const [error, setError] = useState<string>('')
