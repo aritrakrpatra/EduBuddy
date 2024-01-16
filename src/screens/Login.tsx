@@ -1,68 +1,62 @@
-import { StyleSheet, Text, View, KeyboardAvoidingView, TextInput, Pressable, Platform } from 'react-native'
-import React, {useContext, useState} from 'react'
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../routes/AuthStack';
+import { AppwriteContext } from '../appwrite/AppwriteContext';
+import Snackbar from 'react-native-snackbar';
+import Home from '../screens/Home';
 
-//react native elements
-import { FAB } from '@rneui/themed'
-//Snackbar
-import Snackbar from 'react-native-snackbar'
+type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-//context API
-import {AppwriteContext} from '../appwrite/AppwriteContext'
-
-// Navigation
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthStackParamList} from '../routes/AuthStack';
-
-type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>
-
-
-
-const Login = ({navigation}: LoginScreenProps) => {
-  const {appwrite, setIsLoggedIn} = useContext(AppwriteContext);
-
+const Login = ({ navigation }: LoginScreenProps) => {
+  const { appwrite, setIsLoggedIn } = useContext(AppwriteContext);
   const [error, setError] = useState<string>('');
-
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = () => {
     if (email.length < 1 || password.length < 1) {
-      setError('All fields are required')
+      setError('All fields are required');
     } else {
       const user = {
         email,
-        password
-      }
+        password,
+      };
+
       appwrite
-      .login(user)
-      .then((response) => {
-        if (response) {
-          setIsLoggedIn(true);
-          Snackbar.show({
-            text: 'Login Success',
-            duration: Snackbar.LENGTH_SHORT
-          })
-        }
-      })
-      .catch(e => {
-        console.log(e);
-        setEmail('Incorrect email or password')
-        
-      })
+        .login(user)
+        .then((response) => {
+          if (response) {
+            setIsLoggedIn(true);
+            Snackbar.show({
+              text: 'Login Success',
+              duration: Snackbar.LENGTH_SHORT,
+            });
+
+            // Navigate to the Home screen after successful login
+            navigation.navigate('Home');
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setError('Incorrect email or password');
+        });
     }
-  }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.appName}>Appwrite Auth</Text>
+        <Text style={styles.appName}>EduBuddy</Text>
 
         {/* Email */}
         <TextInput
           keyboardType="email-address"
           value={email}
-          onChangeText={text => setEmail(text)}
+          onChangeText={(text) => setEmail(text)}
           placeholderTextColor={'#AEAEAE'}
           placeholder="Email"
           style={styles.input}
@@ -71,7 +65,7 @@ const Login = ({navigation}: LoginScreenProps) => {
         {/* Password */}
         <TextInput
           value={password}
-          onChangeText={text => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
           placeholderTextColor={'#AEAEAE'}
           placeholder="Password"
           style={styles.input}
@@ -84,7 +78,7 @@ const Login = ({navigation}: LoginScreenProps) => {
         {/* Login button */}
         <Pressable
           onPress={handleLogin}
-          style={[styles.btn, {marginTop: error ? 10 : 20}]}>
+          style={[styles.btn, { marginTop: error ? 10 : 20 }]}>
           <Text style={styles.btnText}>Login</Text>
         </Pressable>
 
@@ -100,8 +94,7 @@ const Login = ({navigation}: LoginScreenProps) => {
       </View>
     </KeyboardAvoidingView>
   );
-}
-
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -126,10 +119,8 @@ const styles = StyleSheet.create({
     height: 40,
     alignSelf: 'center',
     borderRadius: 5,
-
     width: '80%',
     color: '#000000',
-
     marginTop: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -138,7 +129,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
-
     elevation: 1,
   },
   errorText: {
@@ -150,12 +140,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 10,
     height: 45,
-
     alignSelf: 'center',
     borderRadius: 5,
     width: '80%',
     marginTop: 20,
-
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -163,7 +151,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
-
     elevation: 3,
   },
   btnText: {
@@ -186,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login
+export default Login;

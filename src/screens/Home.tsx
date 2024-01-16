@@ -58,7 +58,8 @@ const Home = () => {
             resizeMode="contain"
           />
           <Text style={styles.message}>
-            Build Fast. Scale Big. All in One Place.
+            Welcome to EduBuddy!
+            Stay Tuned. Har Ghar Siksha. All in One Place.
           </Text>
           {userData && (
             <View style={styles.userContainer}>
