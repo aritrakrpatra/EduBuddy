@@ -1,29 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { createNativeStackNavigator} from '@react-navigation/native-stack'
+// AppStack.tsx or wherever your navigation stack is defined
 
-import Home from '../screens/Home'
+import { createStackNavigator } from '@react-navigation/stack';
+import Home from '../screens/Home';
+import Student from '../screens/Student';
+import Teacher from '../screens/Teacher';
+import StudyMat from '../screens/StudyMat'; 
 
-export type AppStackParamList = {
-    Home: undefined;
-}
+const Stack = createStackNavigator();
 
-const Stack = createNativeStackNavigator<AppStackParamList>();
-
-
-export const AppStack = () => {
+const AppStack = () => {
   return (
-    <Stack.Navigator
-    screenOptions={{
-      headerTitleAlign:'center',
-      headerBackTitleVisible: false
-    }}
-    >
-      <Stack.Screen name='Home' component={Home} />
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Student" component={Student} />
+      <Stack.Screen name="Teacher" component={Teacher} />
+      <Stack.Screen name="StudyMat" component={StudyMat} />
+
     </Stack.Navigator>
-  )
-}
+  );
+};
 
-
-
-
+export default AppStack;

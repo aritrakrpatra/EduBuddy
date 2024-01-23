@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../routes/AuthStack';
 import { AppwriteContext } from '../appwrite/AppwriteContext';
 import Snackbar from 'react-native-snackbar';
 import Home from '../screens/Home';
+import AsyncStorage from '@react-native-community/async-storage';
+
 
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -14,11 +16,16 @@ const Login = ({ navigation }: LoginScreenProps) => {
   const [error, setError] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  
   const handleLogin = () => {
     if (email.length < 1 || password.length < 1) {
       setError('All fields are required');
     } else {
+      setError('');
+      setLoading(true);
+
       const user = {
         email,
         password,
@@ -27,7 +34,13 @@ const Login = ({ navigation }: LoginScreenProps) => {
       appwrite
         .login(user)
         .then((response) => {
+          setLoading(false);
           if (response) {
+            const { user } = response;
+      
+            // Assuming the user object contains a 'role' field
+            const userRole = user?.role || 'Teacher'; // Provide a default role if 'role' is not available
+            AsyncStorage.setItem('userRole', userRole);
             setIsLoggedIn(true);
             Snackbar.show({
               text: 'Login Success',
@@ -39,6 +52,7 @@ const Login = ({ navigation }: LoginScreenProps) => {
           }
         })
         .catch((e) => {
+          setLoading(false);
           console.log(e);
           setError('Incorrect email or password');
         });
@@ -51,6 +65,17 @@ const Login = ({ navigation }: LoginScreenProps) => {
       style={styles.container}>
       <View style={styles.formContainer}>
         <Text style={styles.appName}>EduBuddy</Text>
+        {/* Password Visibility Toggle */}
+      <Pressable
+        style={styles.passwordToggle}
+        onPress={() => setShowPassword(!showPassword)}>
+        <Text style={styles.passwordToggleText}>
+          {showPassword ? 'Hide Password' : 'Show Password'}
+        </Text>
+      </Pressable>
+
+      {/* Loading Indicator */}
+      {loading && <ActivityIndicator size="large" color="#f02e65" />}
 
         {/* Email */}
         <TextInput
@@ -60,6 +85,7 @@ const Login = ({ navigation }: LoginScreenProps) => {
           placeholderTextColor={'#AEAEAE'}
           placeholder="Email"
           style={styles.input}
+          accessibilityLabel="Email Input"
         />
 
         {/* Password */}
@@ -69,7 +95,8 @@ const Login = ({ navigation }: LoginScreenProps) => {
           placeholderTextColor={'#AEAEAE'}
           placeholder="Password"
           style={styles.input}
-          secureTextEntry
+          secureTextEntry={!showPassword}
+          accessibilityLabel="Password Input"
         />
 
         {/* Validation error */}
@@ -170,6 +197,14 @@ const styles = StyleSheet.create({
   },
   signUpLabel: {
     color: '#1d9bf0',
+  },
+  passwordToggle: {
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  passwordToggleText: {
+    color: '#1d9bf0',
+    fontSize: 15,
   },
 });
 
